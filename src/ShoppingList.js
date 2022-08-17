@@ -1,10 +1,16 @@
+import { useRecoilState } from 'recoil'; 
+import { isEditingState, itemToEditState } from './App';
+
 const ShoppingList = (props) => {
+  const [isEditing, setIsEditing] = useRecoilState(isEditingState)
+  const [itemToEdit, setItemToEdit] = useRecoilState(itemToEditState)
   const deleteHandler = (id) => {
     props.onDelete(id);
   };
 
   const updateHandler = (item) => {
-    props.onUpdate(item);
+    setIsEditing(true);
+    setItemToEdit(item);
   }
 
   const shoppingList = props.items.map((item) => (

@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
+import { atom, RecoilRoot } from "recoil";
 import AddShoppingItem from "./AddShoppingItem";
 import "./App.css";
 import ShoppingList from "./ShoppingList";
 
+export const isEditingState = atom({
+  key: "isEditing",
+  default: false,
+});
+
+export const itemToEditState = atom({
+  key: "itemToEdit",
+  default: [{id: 0, name:""}],
+});
+
 function App() {
   const [shoppingList, setShoppingList] = useState([]);
   const [formKey, setFormKey] = useState(Math.random());
-  const [itemToEdit, setItemToEdit] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const getShoppingList = async () => {
@@ -18,13 +27,14 @@ function App() {
       }
 
       const data = await response.json();
-    
+
       setShoppingList(data);
     };
     getShoppingList();
-  }, [shoppingList.count, formKey ]);
+  }, [shoppingList.count, formKey]);
 
   async function saveExpenseDataHandler(enteredItem) {
+    console.log(JSON.stringify(enteredItem));
     const response = await fetch("https://localhost:7010/ShoppingList", {
       method: "POST",
       body: JSON.stringify(enteredItem),
@@ -34,9 +44,7 @@ function App() {
     });
     const data = await response.json();
 
-    setIsEditing(false);
     setFormKey(Math.random());
-    setItemToEdit([])
   }
 
   async function deleteExpenseHandler(id) {
@@ -51,34 +59,13 @@ function App() {
     setFormKey(Math.random());
   }
 
-  const populateFormHandler = (item) => {
-    setItemToEdit(item);
-    setIsEditing(true);
-    console.log('is editing dad = ' + isEditing + item.id)
-    setFormKey(Math.random());
-  }
-
-  const cancelEditingHandler = () => {
-    console.log('cancelling')
-    setIsEditing(false);
-  }
-
   return (
-    <div className="App">
-      <AddShoppingItem
-        key={formKey}
-        onSubmitItem={saveExpenseDataHandler}
-        isEditing={isEditing}
-        itemToEdit={itemToEdit}
-        onCancelEditing={cancelEditingHandler}
-
-      />
-      <ShoppingList
-        items={shoppingList}
-        onDelete={deleteExpenseHandler}
-        onUpdate={populateFormHandler}
-      />
-    </div>
+    <RecoilRoot>
+      <div className="App">
+        <AddShoppingItem key={formKey} onSubmitItem={saveExpenseDataHandler} />
+        <ShoppingList items={shoppingList} onDelete={deleteExpenseHandler} />
+      </div>
+    </RecoilRoot>
   );
 }
 

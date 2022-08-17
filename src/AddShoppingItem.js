@@ -1,27 +1,34 @@
 import { useRef } from "react";
+import {useRecoilValue, useRecoilState, useResetRecoilState} from 'recoil';
+import { isEditingState, itemToEditState } from "./App";
 
 const AddShoppingItem = (props) => {
-  console.log("props child" + props.isEditing);
+  const [isEditing, setIsEditing] = useRecoilState(isEditingState)
+  const isEditingValue = useRecoilValue(isEditingState);
+  const itemToEdit = useRecoilValue(itemToEditState);
+  const resetItemToEdit = useResetRecoilState(itemToEditState);
   const nameRef = useRef("");
   const idRef = useRef(0);
+
+  console.log('recoil ' + isEditing)
 
   const submitHandler = (event) => {
     event.preventDefault();
 
+    console.log('testing id = ' + idRef.current.value);
     const item = {
-      id: idRef.current.value,
+      id: idRef.current.value === "" ? 0 : idRef.current.value ,
       name: nameRef.current.value,
       isCollected: false,
     };
-    nameRef.current.value="";
-    idRef.current.value=0;
+
     props.onSubmitItem(item);
+    resetItemToEdit();
   };
 
   const cancelUpdateHandler = () => {
-    props.onCancelEditing();
-    nameRef.current.value="";
-    idRef.current.value=0;
+    setIsEditing(false);
+    resetItemToEdit();
   };
 
   return (
@@ -29,15 +36,15 @@ const AddShoppingItem = (props) => {
       <form onSubmit={submitHandler}>
         <div>
           <div>
-            <label>Title</label>
+            <label>Name</label>
             <input
               type="text"
-              defaultValue={props.itemToEdit["name"]}
+              defaultValue={itemToEdit['name']}
               ref={nameRef}
             />
             <input
               type="hidden"
-              defaultValue={props.itemToEdit["id"]}
+              defaultValue={itemToEdit['id']}
               ref={idRef}
             />
           </div>
@@ -47,7 +54,7 @@ const AddShoppingItem = (props) => {
         </div>
       </form>
 
-      {props.isEditing && (
+      {isEditingValue && (
         <button type="submit" onClick={() => cancelUpdateHandler()}>
           Cancel Update
         </button>
