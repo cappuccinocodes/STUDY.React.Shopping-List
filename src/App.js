@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import ShoppingList from "./ShoppingList";
 
 function App() {
   const [shoppingList, setShoppingList] = useState([]);
@@ -21,7 +22,7 @@ function App() {
   }, [shoppingList.count]);
 
   return <div className="App">
-    <div>Hello</div>
+    <ShoppingList items = {shoppingList}/>
   </div>;
 }
 
