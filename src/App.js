@@ -5,6 +5,7 @@ import ShoppingList from "./ShoppingList";
 
 function App() {
   const [shoppingList, setShoppingList] = useState([]);
+  const [formKey, setFormKey] = useState(Math.random());
 
   useEffect(() => {
     const getShoppingList = async () => {
@@ -15,12 +16,12 @@ function App() {
       }
 
       const data = await response.json();
-      console.log(data);
+      console.log(formKey);
       setShoppingList(data);
     };
 
     getShoppingList();
-  }, [shoppingList.count]);
+  }, [shoppingList.count, formKey]);
 
   async function saveExpenseDataHandler(enteredItem) {
     const response = await fetch("https://localhost:7010/ShoppingList", {
@@ -31,12 +32,13 @@ function App() {
       },
     });
     const data = await response.json();
-    console.log(data);
-  };
+
+    setFormKey(Math.random());
+  }
 
   return (
     <div className="App">
-      <AddShoppingItem onSubmitItem={saveExpenseDataHandler} />
+      <AddShoppingItem key={formKey} onSubmitItem={saveExpenseDataHandler} />
       <ShoppingList items={shoppingList} />
     </div>
   );
