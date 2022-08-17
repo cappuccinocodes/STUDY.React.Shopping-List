@@ -1,36 +1,58 @@
-import { useState } from "react";
+import { useRef } from "react";
 
 const AddShoppingItem = (props) => {
-  const [enteredName, setEnteredName] = useState("");
-
-  const nameChangeHandler = (event) => {
-    setEnteredName(event.target.value);
-  };
+  console.log("props child" + props.isEditing);
+  const nameRef = useRef("");
+  const idRef = useRef(0);
 
   const submitHandler = (event) => {
     event.preventDefault();
 
-    const expenseData = {
-      name: enteredName,
+    const item = {
+      id: idRef.current.value,
+      name: nameRef.current.value,
+      isCollected: false,
     };
+    nameRef.current.value="";
+    idRef.current.value=0;
+    props.onSubmitItem(item);
+  };
 
-    props.onSubmitItem(expenseData);
-
-    setEnteredName("");
+  const cancelUpdateHandler = () => {
+    props.onCancelEditing();
+    nameRef.current.value="";
+    idRef.current.value=0;
   };
 
   return (
-    <form onSubmit={submitHandler}>
-      <div>
+    <div>
+      <form onSubmit={submitHandler}>
         <div>
-          <label>Title</label>
-          <input type="text" value={enteredName} onChange={nameChangeHandler} />
+          <div>
+            <label>Title</label>
+            <input
+              type="text"
+              defaultValue={props.itemToEdit["name"]}
+              ref={nameRef}
+            />
+            <input
+              type="hidden"
+              defaultValue={props.itemToEdit["id"]}
+              ref={idRef}
+            />
+          </div>
         </div>
-      </div>
-      <div>
-        <button type="submit">Submit</button>
-      </div>
-    </form>
+        <div>
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+
+      {props.isEditing && (
+        <button type="submit" onClick={() => cancelUpdateHandler()}>
+          Cancel Update
+        </button>
+      )}
+    </div>
   );
 };
 
